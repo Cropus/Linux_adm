@@ -1,0 +1,131 @@
+
+
+#1
+fdisk /dev/sda
+#Partition table
+p
+#New part
+n
+#Primary
+p
+#Number
+3
+#First empty by default
+enter
+#Size
++300M
+#Save
+w
+
+
+#2
+blkid /dev/sda3 > ~/file_uuid
+
+
+#3
+mkfs.ext4 -b 4096 /dev/sda3
+
+
+#4
+dumpe2fs -h /dev/sda3
+
+
+#5
+tune2fa -c 2 -i 2m /dev/sda3
+
+
+#6
+mkdir /mnt/newdisk
+mount /dev/sda3 /mnt/newdisk
+
+
+#7
+ln -s /mnt/newdisk ~/file_sys
+
+
+#8
+mkdir ~/file_sys/catalog
+
+
+#9
+nano /etc/fstab
+# "UUID of /dev/sda3"   /mnt/newdisk  ext4  noexec,noatime,auto 0 0
+reboot
+# Check with"
+mount | egrep "^/dev/sda3"
+
+
+#10
+fdisk /dev/sda
+#Delete
+d
+#Number
+3
+#New
+n
+#Primary
+p
+#Number
+3
+#First empty by default
+enter
+#Size
++350M
+#Save
+w
+
+e2fsck -f /dev/sda3
+resize2fs /dev/sda3
+reboot
+
+#Check with:
+fdisk -l
+df -h
+
+
+
+#11
+fsck -n /dev/sda3
+
+
+#12
+fdisk /dev/sda
+n
+p
+4
+enter
++12M
+w
+
+mkfs.ext4 -b 4096 /dev/sda4
+tune2fs -J location=/dev/sda4/ /dev/sda3
+
+
+#13
+#Repeat twice
+fdisk /dev/sdb
+n
+p
+1(2)
+enter
++100M
+w
+
+
+#14
+vgcreate LVM /dev/sdb1 /dev/sdb2
+lvcreate -l 100%FREE -n LVM LVM
+mkdir /mnt/supernewdisk
+mkfs.ext4 /dev/LVM/LVM
+mount /dev/LVM/LVM /mnt/supernewdisk
+
+
+#15
+mkdir /mnt/share
+mount.cifs //192.168.56.1/Net_test_CentOS /mnt/share
+
+
+#16
+nano /etc/fstab
+#//192.168.56.1/Net_test_CentOS /mnt/share cifs auto 0 0
+

@@ -1,0 +1,12 @@
+#!/bin/sh
+
+rm -rf test
+rm -fr man.dir
+rm -f file.patch
+rm -f man.txt
+rm -f list1
+rm -f list_conf
+rm -f list_d
+rm -f list_conf_d
+
+exit
